@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IRR, NPV, CBR Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        label { display: block; margin-top: 10px; }
+        input { width: 100%%; padding: 8px; margin-top: 4px; }
+        button { margin-top: 15px; padding: 10px 15px; font-size: 16px; }
+        .result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+        img { max-width: 100%%; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>IRR, NPV, CBR Calculator</h1>
+    <form id="calcForm">
+        <label>CAPEX (€): <input type="number" name="capex" required></label>
+        <label>OPEX annuo (€): <input type="number" name="opex" required></label>
+        <label>Benefici annui (€): <input type="number" name="benefits" required></label>
+        <label>Anni: <input type="number" name="years" required></label>
+        <label>Tasso di sconto (%%): <input type="number" name="rate" value="1.5" step="0.1" required></label>
+        <button type="submit">Calcola</button>
+    </form>
+
+    <div class="result" id="results"></div>
+
+    <script>
+        document.getElementById("calcForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const form = new FormData(e.target);
+            const data = Object.fromEntries(form.entries());
+            for (let key in data) data[key] = parseFloat(data[key]);
+
+            const response = await fetch("/calculate", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            const html = `
+                <p><strong>NPV cumulativo:</strong> €${result.npv_cumulative}</p>
+                <p><strong>IRR:</strong> ${result.irr}</p>
+                <p><strong>CB Ratio:</strong> ${result.cb_ratio}</p>
+                <h3>Grafico NPV cumulativo</h3>
+                <img src="data:image/png;base64,${result.npv_plot_base64}">
+                <h3>Grafico costi vs benefici</h3>
+                <img src="data:image/png;base64,${result.cost_benefit_plot_base64}">
+            `;
+            document.getElementById("results").innerHTML = html;
+        });
+    </script>
+</body>
+</html>
