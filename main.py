@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import numpy as np
+import numpy_financial as npf
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
@@ -55,7 +56,7 @@ def calculate(data: InputData):
 
     # IRR calculation from raw cash flows
     cash_flows = [-data.capex] + [(data.benefits - data.opex)] * data.years
-    irr = np.irr(cash_flows)
+    irr = npf.irr(cash_flows)
 
     # Plot 1: NPV cumulative
     fig1, ax1 = plt.subplots()
