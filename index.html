@@ -17,11 +17,11 @@
     <h1>IRR, NPV, CBR Calculator</h1>
     <form id="calcForm">
         <label>CAPEX (€): <input type="number" name="capex" required></label>
-        <label>OPEX annuo (€): <input type="number" name="opex" required></label>
-        <label>Benefici annui (€): <input type="number" name="benefits" required></label>
-        <label>Anni: <input type="number" name="years" required></label>
-        <label>Tasso di sconto (%%): <input type="number" name="rate" value="1.5" step="0.1" required></label>
-        <button type="submit">Calcola</button>
+        <label>Annual OPEX (€): <input type="number" name="opex" required></label>
+        <label>Annual Benefits (€): <input type="number" name="benefits" required></label>
+        <label>Investment Duration (Years): <input type="number" name="years" required></label>
+        <label>Discount Rate (%%): <input type="number" name="rate" value="1.5" step="0.1" required></label>
+        <button type="submit">Calculate</button>
     </form>
 
     <div class="result" id="results"></div>
@@ -41,12 +41,12 @@
 
             const result = await response.json();
             const html = `
-                <p><strong>NPV cumulativo:</strong> €${result.npv_cumulative}</p>
+                <p><strong>Cumulative NPV:</strong> €${result.npv_cumulative}</p>
                 <p><strong>IRR:</strong> ${result.irr}</p>
-                <p><strong>CB Ratio:</strong> ${result.cb_ratio}</p>
-                <h3>Grafico NPV cumulativo</h3>
+                <p><strong>Cost-Benefit Ratio (CBR):</strong> ${result.cb_ratio}</p>
+                <h3>Cumulative Net Present Value</h3>
                 <img src="data:image/png;base64,${result.npv_plot_base64}">
-                <h3>Grafico costi vs benefici</h3>
+                <h3>Discounted Costs vs Benefits</h3>
                 <img src="data:image/png;base64,${result.cost_benefit_plot_base64}">
             `;
             document.getElementById("results").innerHTML = html;

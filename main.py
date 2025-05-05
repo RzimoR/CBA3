@@ -1,6 +1,8 @@
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import numpy as np
 import pandas as pd
@@ -10,7 +12,7 @@ import base64
 
 app = FastAPI()
 
-# CORS abilitato per tutti i domini
+# CORS enabled
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,12 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Serve static index.html
+@app.get("/")
+def read_root():
+    return FileResponse("index.html")
+
 class InputData(BaseModel):
     capex: float
     opex: float
     benefits: float
     years: int
-    rate: float  # expressed as percent, e.g., 1.5 means 1.5%
+    rate: float  # discount rate in percent
 
 @app.post("/calculate")
 def calculate(data: InputData):
@@ -46,7 +53,7 @@ def calculate(data: InputData):
     total_discounted_benefits = df['discounted_benefits'].sum()
     cb_ratio = total_discounted_benefits / total_discounted_costs
 
-    # IRR from raw cash flows
+    # IRR calculation from raw cash flows
     cash_flows = [-data.capex] + [(data.benefits - data.opex)] * data.years
     irr = np.irr(cash_flows)
 
